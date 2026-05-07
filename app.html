@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+
+body {
+    font-family: Arial;
+    background: linear-gradient(to right, #4facfe, #00f2fe);
+    text-align: center;
+    padding: 30px;
+}
+
+.container {
+    background: white;
+    padding: 25px;
+    border-radius: 15px;
+    width: 75%;
+    margin: auto;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+}
+
+button {
+    background: #0077ff;
+    color: white;
+    padding: 10px 18px;
+    border: none;
+    border-radius: 8px;
+    margin: 10px;
+    cursor: pointer;
+}
+
+button:hover {
+    background: #0056cc;
+}
+
+select {
+    padding: 8px;
+    margin-top: 10px;
+}
+
+table {
+    margin-top: 20px;
+    border-collapse: collapse;
+    width: 100%;
+}
+
+td {
+    border: 1px solid #ddd;
+    padding: 6px;
+}
+
+#result {
+    margin-top: 15px;
+    font-size: 18px;
+    color: green;
+    text-align: left;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<h2>🤖 Smart Algorithm Selector</h2>
+
+<input type="file" id="fileInput" accept=".csv"><br>
+
+<button onclick="uploadFile()">Upload</button>
+
+<br>
+
+<label>Select Target Column:</label><br>
+<select id="targetSelect"></select><br>
+
+<button onclick="suggestAlgorithm()">🚀 Suggest Best Algorithm</button>
+
+<h3>📊 Dataset Preview:</h3>
+<table id="table"></table>
+
+<div id="result"></div>
+
+</div>
+
+<script>
+
+let csvData = [];
+let headers = [];
+
+function uploadFile() {
+    let file = document.getElementById("fileInput").files[0];
+
+    if (!file) {
+        alert("Please select a file");
+        return;
+    }
+
+    let reader = new FileReader();
+
+    reader.onload = function(e) {
+        let text = e.target.result.trim();
+        let rows = text.split("\n");
+
+        csvData = rows.map(row => row.split(","));
+        headers = csvData[0];
+
+        displayTable();
+        loadDropdown();
+    };
+
+    reader.readAsText(file);
+}
+
+function displayTable() {
+    let table = document.getElementById("table");
+    table.innerHTML = "";
+
+    csvData.slice(0, 10).forEach(row => {
+        let tr = document.createElement("tr");
+
+        row.forEach(col => {
+            let td = document.createElement("td");
+            td.innerText = col;
+            tr.appendChild(td);
+        });
+
+        table.appendChild(tr);
+    });
+}
+
+function loadDropdown() {
+    let select = document.getElementById("targetSelect");
+    select.innerHTML = "";
+
+    headers.forEach((col, index) => {
+        let option = document.createElement("option");
+        option.value = index;
+        option.text = col;
+        select.appendChild(option);
+    });
+}
+
+function suggestAlgorithm() {
+
+    if (csvData.length === 0) {
+        alert("Upload dataset first!");
+        return;
+    }
+
+    let targetIndex = document.getElementById("targetSelect").value;
+
+    let values = [];
+
+    for (let i = 1; i < csvData.length; i++) {
+        values.push(csvData[i][targetIndex]);
+    }
+
+    let unique = [...new Set(values)];
+    let isNumeric = values.every(v => !isNaN(v));
+
+    let result = document.getElementById("result");
+
+    let output = "<b>📌 Smart Suggestions:</b><br><br>";
+
+    if (isNumeric && unique.length > 10) {
+        output += "🔹 Problem Type: Regression<br>";
+        output += "✅ Linear Regression<br>";
+        output += "✅ Random Forest Regressor<br>";
+        output += "✅ Gradient Boosting<br>";
+    } 
+    else if (unique.length <= 10) {
+        output += "🔹 Problem Type: Classification<br>";
+        output += "✅ Logistic Regression<br>";
+        output += "✅ Decision Tree<br>";
+        output += "✅ Random Forest<br>";
+        output += "✅ SVM<br>";
+    } 
+    else {
+        output += "🔹 Problem Type: Clustering<br>";
+        output += "✅ K-Means<br>";
+        output += "✅ DBSCAN<br>";
+    }
+
+    output += "<br>📊 Dataset Size: " + (csvData.length - 1) + " rows";
+
+    result.innerHTML = output;
+}
+
+</script>
+
+</body>
+</html>

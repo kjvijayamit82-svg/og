@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+
+body {
+    font-family: Arial;
+    background: linear-gradient(to right, #4facfe, #00f2fe);
+    text-align: center;
+    padding: 40px;
+}
+
+.container {
+    background: white;
+    padding: 25px;
+    border-radius: 15px;
+    width: 70%;
+    margin: auto;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+}
+
+button {
+    background: #0077ff;
+    color: white;
+    padding: 10px 18px;
+    border: none;
+    border-radius: 8px;
+    margin: 10px;
+    cursor: pointer;
+}
+
+button:hover {
+    background: #0056cc;
+}
+
+table {
+    margin-top: 20px;
+    border-collapse: collapse;
+    width: 100%;
+}
+
+td {
+    border: 1px solid #ddd;
+    padding: 8px;
+}
+
+#result {
+    font-size: 18px;
+    margin-top: 15px;
+    color: green;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<h2>📂 Upload CSV File</h2>
+
+<input type="file" id="fileInput" accept=".csv"><br>
+
+<button onclick="uploadFile()">Upload</button>
+<button onclick="suggestAlgorithm()">🤖 Suggest Algorithm</button>
+
+<h3>📊 CSV Data:</h3>
+<table id="table"></table>
+
+<div id="result"></div>
+
+</div>
+
+<script>
+
+let csvData = [];
+
+function uploadFile() {
+    let file = document.getElementById("fileInput").files[0];
+
+    if (!file) {
+        alert("Please select a file");
+        return;
+    }
+
+    let reader = new FileReader();
+
+    reader.onload = function(e) {
+        let text = e.target.result;
+        let rows = text.trim().split("\n");
+
+        csvData = rows.map(row => row.split(","));
+
+        let table = document.getElementById("table");
+        table.innerHTML = "";
+
+        csvData.forEach(row => {
+            let tr = document.createElement("tr");
+
+            row.forEach(col => {
+                let td = document.createElement("td");
+                td.innerText = col;
+                tr.appendChild(td);
+            });
+
+            table.appendChild(tr);
+        });
+    };
+
+    reader.readAsText(file);
+}
+
+function suggestAlgorithm() {
+
+    if (csvData.length === 0) {
+        alert("Upload file first!");
+        return;
+    }
+
+    let lastColumnIndex = csvData[0].length - 1;
+
+    let isNumeric = true;
+
+    for (let i = 1; i < csvData.length; i++) {
+        let value = csvData[i][lastColumnIndex];
+
+        if (isNaN(value)) {
+            isNumeric = false;
+            break;
+        }
+    }
+
+    let result = document.getElementById("result");
+
+    if (isNumeric) {
+        result.innerHTML = "✅ Suggested: Regression (Linear Regression, Random Forest)";
+    } else {
+        result.innerHTML = "✅ Suggested: Classification (Logistic Regression, Decision Tree)";
+    }
+}
+
+</script>
+
+</body>
+</html>
